@@ -53,7 +53,7 @@ var machineCmd = &cobra.Command{
 				Authn: &v1.Authn_DirectAuthn{
 					DirectAuthn: &v1.DirectAuthn{
 						Host: &v1.Host{
-							Host: "127.0.0.1",
+							Host: "worker3-pjshah",
 						},
 						Username: "ADMIN",
 						Password: "ADMIN",

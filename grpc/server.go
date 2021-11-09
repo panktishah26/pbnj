@@ -42,7 +42,7 @@ func WithBmcTimeout(t time.Duration) ServerOption {
 }
 
 // RunServer registers all services and runs the server.
-func RunServer(ctx context.Context, log logging.Logger, grpcServer *grpc.Server, port string, httpServer *http.Server, opts ...ServerOption) error {
+func RunServer(ctx context.Context, log logging.Logger, grpcServer *grpc.Server, port string, httpServer *http.Server, api string, opts ...ServerOption) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -69,12 +69,21 @@ func RunServer(ctx context.Context, log logging.Logger, grpcServer *grpc.Server,
 		Log:        log,
 	}
 
-	ms := rpc.MachineService{
-		Log:        log,
-		TaskRunner: taskRunner,
-		Timeout:    defaultServer.bmcTimeout,
+	if api == "govc" {
+		ms := rpc.MachineServiceGovc{
+			Log:        log,
+			TaskRunner: taskRunner,
+			Timeout:    defaultServer.bmcTimeout,
+		}
+		v1.RegisterMachineServer(grpcServer, &ms)
+	} else {
+		ms := rpc.MachineServiceGovc{
+			Log:        log,
+			TaskRunner: taskRunner,
+			Timeout:    defaultServer.bmcTimeout,
+		}
+		v1.RegisterMachineServer(grpcServer, &ms)
 	}
-	v1.RegisterMachineServer(grpcServer, &ms)
 
 	bs := rpc.BmcService{
 		Log:        log,
